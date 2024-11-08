@@ -23,6 +23,11 @@ use ({
   },
   opt = false,
   config = function() 
+    -- optionally override source of lsp settings table, otherwise use rust-tools.nvim
+    require('rust_cfg').setup({ get_settings = function()
+      return your_global_settings_object_or_whereever_its_stored
+    end
+    })
     require('telescope').load_extension('rust_cfg') 
   end
 })
