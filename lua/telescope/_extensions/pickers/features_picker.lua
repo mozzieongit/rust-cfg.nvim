@@ -1,5 +1,6 @@
 local actions       = require('telescope.actions')
 local actions_state = require('telescope.actions.state')
+local actions_utils = require('telescope.actions.utils')
 local conf          = require('telescope.config').values
 local finders       = require('telescope.finders')
 local pickers       = require('telescope.pickers')
@@ -56,10 +57,23 @@ local picker = async.wrap(function(opts)
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr)
           actions.select_default:replace(function()
-            local selection = actions_state.get_selected_entry()
-            actions.close(prompt_bufnr)
+            local selected = {}
+            actions_utils.map_selections(prompt_bufnr, function(selection)
+              table.insert(selected, selection)
+            end)
 
-            rust_cfg.toggle_feature(selection.value)
+            local used_multi = false
+            for _,v in ipairs(selected) do
+              used_multi = true
+              rust_cfg.toggle_feature(v.value)
+            end
+
+            if not used_multi then
+              local selection = actions_state.get_selected_entry()
+              rust_cfg.toggle_feature(selection.value)
+            end
+
+            actions.close(prompt_bufnr)
           end)
           return true
         end,
