@@ -39,9 +39,9 @@ local function get_targets(callback)
 
   -- Job callback
   local function on_exit(j, code, signal)
+    local data
     local cancelled = signal ~= 0
 
-    local json = nil
     if code == 0 then
       data = table.concat(j:result(), "\n")
     end

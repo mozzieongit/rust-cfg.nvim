@@ -14,7 +14,7 @@ local targets_picker  = require('telescope._extensions.pickers.targets_picker')
 local run_features = function(opts)
   opts = opts or {}
 
-  defaults = {
+  local defaults = {
     -- action = action,
   }
 
@@ -24,7 +24,7 @@ end
 local run_targets = function(opts)
   opts = opts or {}
 
-  defaults = {
+  local defaults = {
     -- action = action,
   }
 
