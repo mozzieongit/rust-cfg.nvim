@@ -68,10 +68,6 @@ end
 -- Toggle a feature 
 -- @param feature string - The feature to toggle
 M.toggle_feature = function(feature)
-  if M.metadata.features == "all" then
-    M.metadata.features = {}
-  end
-
   local idx = nil
   for i, f in ipairs(M.metadata.features) do
     if f == feature then
@@ -90,7 +86,7 @@ end
 
 -- Configure rust-analyzer in order to check all features
 M.set_all_features = function()
-  M.metadata.features = "all"
+  M.metadata.features = { "all" }
   set_rust_analyzer_features(M.metadata.features)
 end
 

@@ -23,11 +23,7 @@ local picker        = async.wrap(function(opts)
             local selection = actions_state.get_selected_entry()
             actions.close(prompt_bufnr)
 
-            if selection.value == "all" then
-              rust_cfg.set_all_features()
-            else
-              rust_cfg.toggle_feature(selection.value)
-            end
+            rust_cfg.toggle_feature(selection.value)
           end)
           return true
         end,
