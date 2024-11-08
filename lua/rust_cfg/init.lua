@@ -1,41 +1,13 @@
-local rt = require('rust-tools')
 local has_rusttools, rusttools = pcall(require, "rust-tools")
 
-if not has_rusttools then
-  error("This plugins requires rust-tools")
-end
-
--- -----------------------------------------------------------------------------
--- rust-analyzer configuration
--- -----------------------------------------------------------------------------
-local set_rust_analyzer_features = function(features)
-  -- check if cargo is nil which could happend depending on the configuration used
-  if not rusttools.config.options.server.settings["rust-analyzer"].cargo then
-    rusttools.config.options.server.settings["rust-analyzer"].cargo= {
-      features = features
-    }
-  else
-    rusttools.config.options.server.settings["rust-analyzer"].cargo.features = features
+local defaults_opts = {
+  get_settings = function()
+    if not has_rusttools then
+      error("Either use rusttools, or override get_settings function")
+    end
+    return rusttools.config.options.server.settings
   end
-  vim.cmd[[:LspRestart<CR>]]
-end
-
-local set_rust_analyzer_target = function(target_triple)
-  -- check if cargo is nil which could happend depending on the configuration used
-  if not rusttools.config.options.server.settings["rust-analyzer"].cargo then
-    rusttools.config.options.server.settings["rust-analyzer"].cargo= {
-      target = target_triple
-    }
-  else
-    rusttools.config.options.server.settings["rust-analyzer"].cargo.target = target_triple
-  end
-  vim.cmd[[:LspRestart<CR>]]
-end
-
--- -----------------------------------------------------------------------------
--- Plugin functions
--- -----------------------------------------------------------------------------
-local defaults_opts = {}
+}
 local M = {}
 
 M.metadata = {
@@ -51,6 +23,47 @@ M.setup = function(opts)
   opts = opts or {}
   M.options = vim.tbl_deep_extend("force", defaults_opts, opts)
 end
+
+-- -----------------------------------------------------------------------------
+-- rust-analyzer configuration
+-- -----------------------------------------------------------------------------
+local set_rust_analyzer_features = function(features)
+  local settings = M.options.get_settings()
+  if settings == nil then
+    error("Couldn't get LSP settings")
+  end
+
+  -- check if cargo is nil which could happend depending on the configuration used
+  if not settings["rust-analyzer"].cargo then
+    settings["rust-analyzer"].cargo= {
+      features = features
+    }
+  else
+    settings["rust-analyzer"].cargo.features = features
+  end
+  vim.cmd[[:LspRestart<CR>]]
+end
+
+local set_rust_analyzer_target = function(target_triple)
+  local settings = M.options.get_settings()
+  if settings == nil then
+    error("Couldn't get LSP settings")
+  end
+
+  -- check if cargo is nil which could happend depending on the configuration used
+  if not settings["rust-analyzer"].cargo then
+    settings["rust-analyzer"].cargo = {
+      target = target_triple
+    }
+  else
+    settings["rust-analyzer"].cargo.target = target_triple
+  end
+  vim.cmd[[:LspRestart<CR>]]
+end
+
+-- -----------------------------------------------------------------------------
+-- Plugin functions
+-- -----------------------------------------------------------------------------
 
 -- Toggle a feature 
 -- @param feature string - The feature to toggle
