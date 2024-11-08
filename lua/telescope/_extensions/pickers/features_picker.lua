@@ -8,7 +8,43 @@ local rust_cfg      = require('rust_cfg')
 local rust_metadata = require('rust_cfg.cargo_metadata')
 local async         = require('rust_cfg.async')
 
-local picker        = async.wrap(function(opts)
+local function display_feature(feature, active)
+  if active[feature] then
+    return "★ " .. feature
+  else
+    return "  " .. feature
+  end
+end
+
+local function feature_entry_maker()
+  local client = vim.lsp.get_clients({ bufnr = 0 })[1]
+  local lsp_features = client.config.settings["rust-analyzer"].cargo.features
+  local active = {}
+  for _, v in ipairs(lsp_features) do
+    active[v] = true
+  end
+
+  local lookup_keys = {
+    display = 2,
+    ordinal = 1,
+    value = 1,
+  }
+
+  local mt_string_entry = {
+    __index = function(t, k)
+      return rawget(t, lookup_keys[k])
+    end,
+  }
+
+  return function(line)
+    return setmetatable({
+      line,
+      display_feature(line, active),
+    }, mt_string_entry)
+  end
+end
+
+local picker = async.wrap(function(opts)
   local features, cancelled = rust_metadata.get_features()
   if cancelled then return end
 
@@ -16,7 +52,7 @@ local picker        = async.wrap(function(opts)
   pickers
       .new(opts, {
         prompt_title = "Cargo features",
-        finder = finders.new_table({ results = features }),
+        finder = finders.new_table({ results = features, entry_maker = feature_entry_maker() }),
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr)
           actions.select_default:replace(function()
