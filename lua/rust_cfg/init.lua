@@ -47,7 +47,7 @@ M.metadata = {
 
 M.options = {}
 
-M.setup = function(opts) 
+M.setup = function(opts)
   opts = opts or {}
   M.options = vim.tbl_deep_extend("force", defaults_opts, opts)
 end
@@ -55,7 +55,7 @@ end
 -- Toggle a feature 
 -- @param feature string - The feature to toggle
 M.toggle_feature = function(feature)
-  if M.metadata.features == "all" then 
+  if M.metadata.features == "all" then
     M.metadata.features = {}
   end
 

@@ -12,8 +12,8 @@ local function get_rustup_targets(on_exit)
   return Job:new({
     command = "rustup",
     args = {
-      "target", 
-      "list", 
+      "target",
+      "list",
       "--installed"
     },
     on_exit = vim.schedule_wrap(on_exit),

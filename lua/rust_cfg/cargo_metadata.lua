@@ -4,26 +4,26 @@ if not has_plenary_job then
 end
 
 -- -----------------------------------------------------------------------------
--- Utils 
+-- Utils
 -- -----------------------------------------------------------------------------
 local JSON_DECODE_OPTS = { luanil = { object = true, array = true } }
 
 local function parse_json(json_str)
-   if not json_str then
-      return
-   end
-   local success, json = pcall(vim.json.decode, json_str, JSON_DECODE_OPTS)
-   if not success then
-      return
-   end
+  if not json_str then
+    return
+  end
+  local success, json = pcall(vim.json.decode, json_str, JSON_DECODE_OPTS)
+  if not success then
+    return
+  end
 
-   if json and type(json) == "table" then
-      return json
-   end
+  if json and type(json) == "table" then
+    return json
+  end
 end
 
 -- -----------------------------------------------------------------------------
--- Main logic 
+-- Main logic
 -- -----------------------------------------------------------------------------
 
 -- the features list retrieved from cargo metadata
@@ -36,9 +36,9 @@ local function get_cargo_metadata(on_exit)
   return Job:new({
     command = "cargo",
     args = {
-      "metadata", 
-      "--no-deps", 
-      "--format-version","1" 
+      "metadata",
+      "--no-deps",
+      "--format-version", "1"
     },
     on_exit = vim.schedule_wrap(on_exit),
   })
@@ -52,7 +52,7 @@ end
 function M.parse_features(json_str)
   local json = parse_json(json_str)
   if not (json and json.packages) then
-    return 
+    return
   end
 
   local crate_data = json.packages[1]
@@ -66,8 +66,8 @@ end
 
 local function get_features(callback)
   if M.jobs then
-      return
-   end
+    return
+  end
 
   local callbacks = { callback }
 
@@ -82,7 +82,7 @@ local function get_features(callback)
 
     local features = {}
     if not cancelled then
-     features = M.parse_features(json)
+      features = M.parse_features(json)
     end
     for _, c in ipairs(callbacks) do
       c(features, cancelled)
@@ -100,9 +100,9 @@ local function get_features(callback)
 end
 
 function M.get_features()
-   return coroutine.yield(function(resolve)
-      get_features(resolve)
-   end)
+  return coroutine.yield(function(resolve)
+    get_features(resolve)
+  end)
 end
 
 return M

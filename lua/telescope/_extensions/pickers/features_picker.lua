@@ -8,30 +8,30 @@ local rust_cfg      = require('rust_cfg')
 local rust_metadata = require('rust_cfg.cargo_metadata')
 local async         = require('rust_cfg.async')
 
-local picker = async.wrap(function(opts)
+local picker        = async.wrap(function(opts)
   local features, cancelled = rust_metadata.get_features()
   if cancelled then return end
 
   opts = opts or {}
   pickers
-    .new(opts, {
-      prompt_title = "Cargo features",
-      finder = finders.new_table({ results = features }),
-      sorter = conf.generic_sorter(opts),
-      attach_mappings = function(prompt_bufnr)
+      .new(opts, {
+        prompt_title = "Cargo features",
+        finder = finders.new_table({ results = features }),
+        sorter = conf.generic_sorter(opts),
+        attach_mappings = function(prompt_bufnr)
           actions.select_default:replace(function()
-	  local selection = actions_state.get_selected_entry()
-	  actions.close(prompt_bufnr)
+            local selection = actions_state.get_selected_entry()
+            actions.close(prompt_bufnr)
 
-	  if selection.value == "all" then
-	    rust_cfg.set_all_features()
-	  else
-	    rust_cfg.toggle_feature(selection.value)
-	  end
-	end)
-	return true
-      end,
-    }):find()
+            if selection.value == "all" then
+              rust_cfg.set_all_features()
+            else
+              rust_cfg.toggle_feature(selection.value)
+            end
+          end)
+          return true
+        end,
+      }):find()
 end)
 
 return picker
